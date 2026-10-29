@@ -1,4 +1,5 @@
 # ./NodeTester/NodeTester.csproj
+
 ```csharp
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
@@ -14,16 +15,20 @@
   </ItemGroup>
 
 </Project>
+
 ```
 
 # ./NodeTester/Program.cs
+
 ```csharp
 ﻿using Nodes;
 
 NodeGraph graph = new();
+
 ```
 
 # ./Nodes/BasicNodes/AndNode.cs
+
 ```csharp
 ﻿namespace Nodes.BasicNodes;
 public class AndNode : Node
@@ -37,9 +42,11 @@ public class AndNode : Node
 	public InputSocket<bool> A { get; }
 	public InputSocket<bool> B { get; }
 	public OutputSocket<bool> Output { get; }
-}```
+}
+```
 
 # ./Nodes/Connection.cs
+
 ```csharp
 ﻿namespace Nodes;
 
@@ -54,9 +61,11 @@ public class Connection<T>(OutputSocket<T> output, InputSocket<T> input) : IConn
 	public InputSocket<T> Input { get; } = input;
 	IOutputSocket IConnection.Output => Output;
 	IInputSocket IConnection.Input => Input;
-}```
+}
+```
 
 # ./Nodes/InputSocket.cs
+
 ```csharp
 ﻿namespace Nodes;
 
@@ -80,9 +89,11 @@ public class InputSocket<T> : Socket<T>, IInputSocket
 	public override T Value => Connection is null ? DefaultValue : Connection.Output.Value;
 
 	public override event Action? ValueChanged;
-}```
+}
+```
 
 # ./Nodes/Node.cs
+
 ```csharp
 ﻿namespace Nodes;
 public abstract class Node(string name)
@@ -115,9 +126,11 @@ public abstract class Node(string name)
 		outputs.Add(output);
 		return output;
 	}
-}```
+}
+```
 
 # ./Nodes/NodeGraph.cs
+
 ```csharp
 ﻿namespace Nodes;
 public class NodeGraph
@@ -159,9 +172,11 @@ public class NodeGraph
 	public IConnection? GetConnection(ISocket socket) => connections.FirstOrDefault(c => c.Input == socket || c.Output == socket);
 	public Connection<T>? GetConnection<T>(Socket<T> socket) => GetConnection(socket);
 	public IEnumerable<IConnection> GetConnections(IOutputSocket output) => connections.Where(c => c.Output == output);
-}```
+}
+```
 
 # ./Nodes/Nodes.csproj
+
 ```csharp
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
@@ -172,9 +187,11 @@ public class NodeGraph
   </PropertyGroup>
 
 </Project>
+
 ```
 
 # ./Nodes/OutputSocket.cs
+
 ```csharp
 ﻿namespace Nodes;
 
@@ -197,9 +214,11 @@ public class OutputSocket<T> : Socket<T>, IOutputSocket
 	public override T Value => value;
 
 	public override event Action? ValueChanged;
-}```
+}
+```
 
 # ./Nodes/Socket.cs
+
 ```csharp
 ﻿namespace Nodes;
 
@@ -229,5 +248,6 @@ public abstract class Socket<T>(Node owner, string name) : ISocket
 	public string Name { get; } = name;
 	public abstract T Value { get; }
 	object? ISocket.Value => Value;
-}```
+}
+```
 

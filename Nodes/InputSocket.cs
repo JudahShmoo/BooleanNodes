@@ -3,10 +3,13 @@
 public interface IInputSocket : ISocket { }
 public class InputSocket<T> : Socket<T>, IInputSocket
 {
+	private void InvokeValueChanged() => ValueChanged?.Invoke();
 	public InputSocket(Node owner, string name) : base(owner, name)
 	{
-		OnConnection += () => ValueChanged?.Invoke();
-		OnDisconnection += () => ValueChanged?.Invoke();
+		OnConnection += InvokeValueChanged;
+		OnConnection += () => Connection!.Output.ValueChanged += InvokeValueChanged;
+		OnDisconnection += InvokeValueChanged;
+		OnDisconnection += () => Connection!.Output.ValueChanged -= InvokeValueChanged;
 	}
 	public required T DefaultValue { 
 		get; 

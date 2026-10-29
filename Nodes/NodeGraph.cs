@@ -19,7 +19,8 @@ public class NodeGraph
 	{
 		node.Graph = null;
 		nodes.Remove(node);
-		connections.RemoveAll(c => c.Input.Owner == node || c.Output.Owner == node);
+		foreach (IConnection connection in connections.Where(c => c.Input.Owner == node || c.Output.Owner == node))
+			Disconnect(connection);
 	}
 
 	public Connection<T> Connect<T>(OutputSocket<T> output, InputSocket<T> input)
@@ -28,11 +29,13 @@ public class NodeGraph
 		Connection<T> connection = new(output, input);
 		connections.Add(connection);
 		OnConnection?.Invoke(connection);
+		connection.NotifyConnection();
 		return connection;
 	}
 	public void Disconnect(IConnection connection)
 	{
 		connections.Remove(connection);
+		connection.NotifyDisconnection();
 		OnDisconnection?.Invoke(connection);
 	}
 	public IConnection? GetConnection(ISocket socket) => connections.FirstOrDefault(c => c.Input == socket || c.Output == socket);

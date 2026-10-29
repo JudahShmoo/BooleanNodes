@@ -4,25 +4,23 @@ public interface IConnection
 {
 	IOutputSocket Output { get; }
 	IInputSocket Input { get; }
+	void NotifyConnection();
+	void NotifyDisconnection();
 }
-public class Connection<T> : IConnection
+public class Connection<T>(OutputSocket<T> output, InputSocket<T> input) : IConnection
 {
-	public OutputSocket<T> Output { get; }
-	public InputSocket<T> Input { get; }
+	public OutputSocket<T> Output { get; } = output;
+	public InputSocket<T> Input { get; } = input;
 	IOutputSocket IConnection.Output => Output;
 	IInputSocket IConnection.Input => Input;
-
-	public Connection(OutputSocket<T> output, InputSocket<T> input)
+	public void NotifyConnection()
 	{
-		Output = output;
-		Input = input;
 		Output.NotifyConnection();
 		Input.NotifyConnection();
 	}
-
-	~Connection()
+	public void NotifyDisconnection()
 	{
-		Output.NotifyConnection();
-		Input.NotifyConnection();
+		Output.NotifyDisconnection();
+		Input.NotifyDisconnection();
 	}
 }

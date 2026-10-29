@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Nodes/Nodes.csproj" />
+  <Project Path="NodeTester/NodeTester.csproj" />
+</Solution>

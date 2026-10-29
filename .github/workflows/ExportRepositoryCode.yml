@@ -26,11 +26,15 @@ jobs:
             -not -path "*/.git/*" \
             | sort | while read file; do
 
-              echo "# $file" >> "$OUTPUT"
-              echo '```csharp' >> "$OUTPUT"
-              cat "$file" >> "$OUTPUT"
-              echo '```' >> "$OUTPUT"
-              echo >> "$OUTPUT"
+            {
+              echo "# $file"
+              echo
+              echo '```csharp'
+              cat "$file"
+              echo
+              echo '```'
+              echo
+            } >> "$OUTPUT"
             done
 
       - name: Commit dump

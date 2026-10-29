@@ -39,6 +39,6 @@ public class NodeGraph
 		OnDisconnection?.Invoke(connection);
 	}
 	public IConnection? GetConnection(ISocket socket) => connections.FirstOrDefault(c => c.Input == socket || c.Output == socket);
-	public Connection<T>? GetConnection<T>(Socket<T> socket) => GetConnection(socket);
+	public Connection<T>? GetConnection<T>(Socket<T> socket) => connections.Cast<Connection<T>>().FirstOrDefault(c => c.Input == socket || c.Output == socket);
 	public IEnumerable<IConnection> GetConnections(IOutputSocket output) => connections.Where(c => c.Output == output);
 }

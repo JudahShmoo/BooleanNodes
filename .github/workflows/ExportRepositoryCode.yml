@@ -1,0 +1,33 @@
+name: Export Repository Code
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  export-code:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate code dump
+        run: |
+          OUTPUT=code-dump.md
+          > "$OUTPUT"
+      
+          find . -type f \
+            \( -name "*.cs" -o -name "*.csproj" -o -name "*.sln" \) \
+            | sort | while read file; do
+      
+              echo "# $file" >> "$OUTPUT"
+              echo '```' >> "$OUTPUT"
+              cat "$file" >> "$OUTPUT"
+              echo '```' >> "$OUTPUT"
+              echo >> "$OUTPUT"
+            done
+      
+          cat "$OUTPUT"

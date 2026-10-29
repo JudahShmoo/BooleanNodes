@@ -10,16 +10,13 @@ public abstract class Node(string name)
 	public IReadOnlyList<IInputSocket> Inputs => inputs;
 	public IReadOnlyList<IOutputSocket> Outputs => outputs;
 
-	public event Action? OnInputChanged
-	{
-		add => inputs.ForEach(i => i.ValueChanged += value);
-		remove => inputs.ForEach(i => i.ValueChanged -= value);
-	}
+	public event Action? OnInputChanged;
 
 	protected InputSocket<T> AddInput<T>(string name, T defaultValue)
 	{
 		InputSocket<T> input = new(this, name)
 		{ DefaultValue = defaultValue };
+		input.ValueChanged += () => OnInputChanged?.Invoke();
 		inputs.Add(input);
 		return input;
 	}

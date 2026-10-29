@@ -55,12 +55,26 @@ public interface IConnection
 	IOutputSocket Output { get; }
 	IInputSocket Input { get; }
 }
-public class Connection<T>(OutputSocket<T> output, InputSocket<T> input) : IConnection
+public class Connection<T> : IConnection
 {
-	public OutputSocket<T> Output { get; } = output;
-	public InputSocket<T> Input { get; } = input;
+	public OutputSocket<T> Output { get; }
+	public InputSocket<T> Input { get; }
 	IOutputSocket IConnection.Output => Output;
 	IInputSocket IConnection.Input => Input;
+
+	public Connection(OutputSocket<T> output, InputSocket<T> input)
+	{
+		Output = output;
+		Input = input;
+		Output.NotifyConnection();
+		Input.NotifyConnection();
+	}
+
+	~Connection()
+	{
+		Output.NotifyConnection();
+		Input.NotifyConnection();
+	}
 }
 ```
 
@@ -107,16 +121,13 @@ public abstract class Node(string name)
 	public IReadOnlyList<IInputSocket> Inputs => inputs;
 	public IReadOnlyList<IOutputSocket> Outputs => outputs;
 
-	public event Action? OnInputChanged
-	{
-		add => inputs.ForEach(i => i.ValueChanged += value);
-		remove => inputs.ForEach(i => i.ValueChanged -= value);
-	}
+	public event Action? OnInputChanged;
 
 	protected InputSocket<T> AddInput<T>(string name, T defaultValue)
 	{
 		InputSocket<T> input = new(this, name)
 		{ DefaultValue = defaultValue };
+		input.ValueChanged += () => OnInputChanged?.Invoke();
 		inputs.Add(input);
 		return input;
 	}
@@ -228,26 +239,22 @@ public interface ISocket
 	string Name { get; }
 	abstract object? Value { get; }
 	event Action? ValueChanged;
+	NodeGraph? Graph { get; }
+	IConnection? Connection => Graph?.GetConnection(this);
 }
 public abstract class Socket<T>(Node owner, string name) : ISocket
 {
 	public abstract event Action? ValueChanged;
 	public NodeGraph? Graph => Owner.Graph;
 	public Connection<T>? Connection => Graph?.GetConnection(this);
-	public event Action? OnConnection
-	{
-		add => Graph!.OnConnection += c => { if (c.Input == this || c.Output == this) value?.Invoke(); };
-		remove => Graph!.OnConnection -= c => { if (c.Input == this || c.Output == this) value?.Invoke(); };
-	}
-	public event Action? OnDisconnection
-	{
-		add => Graph!.OnDisconnection += c => { if (c.Input == this || c.Output == this) value?.Invoke(); };
-		remove => Graph!.OnDisconnection -= c => { if (c.Input == this || c.Output == this) value?.Invoke(); };
-	}
 	public Node Owner { get; } = owner;
 	public string Name { get; } = name;
 	public abstract T Value { get; }
 	object? ISocket.Value => Value;
+	public event Action? OnConnection;
+	public event Action? OnDisconnection;
+	internal void NotifyConnection() => OnConnection?.Invoke();
+	internal void NotifyDisconnection() => OnDisconnection?.Invoke();
 }
 ```
 

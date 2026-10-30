@@ -1,4 +1,5 @@
 <Solution>
+  <Project Path="Editor/Editor.csproj" Id="fa7b23cd-4f1d-4ea6-9305-ffffd543149f" />
   <Project Path="Nodes/Nodes.csproj" />
   <Project Path="NodeTester/NodeTester.csproj" />
 </Solution>

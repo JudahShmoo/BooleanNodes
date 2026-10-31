@@ -1,11 +1,137 @@
 {
-	"$schema": "./Editor/save.schema.json",
-	"projectName": "Test Project",
-	"graphs": [
-		{
-			"name": "Test Graph",
-			"nodes": [],
-			"connections": []
-		}
-	]
+    "$schema": "./Editor/save.schema.json",
+    "projectName": "Test Project",
+    "graphs": [
+        {
+            "name": "Test Graph",
+            "nodes": [
+                {
+                    "guid": "12345678-1234-1234-1234-123456789000",
+                    "name": "And",
+                    "type": "AndNode",
+                    "position": {
+                        "x": 100,
+                        "y": 200
+                    },
+                    "inputSockets": [
+                        {
+                            "guid": "12345678-1234-1234-1234-123456789001",
+                            "name": "A",
+                            "type": "Boolean"
+                        },
+                        {
+                            "guid": "12345678-1234-1234-1234-123456789002",
+                            "name": "B",
+                            "type": "Boolean"
+                        }
+                    ],
+                    "outputSockets": [
+                        {
+                            "guid": "12345678-1234-1234-1234-123456789003",
+                            "name": "Output",
+                            "type": "Boolean"
+                        }
+                    ]
+                },
+                {
+                    "guid": "12345678-1234-1234-1234-123456789010",
+                    "name": "And",
+                    "type": "AndNode",
+                    "position": {
+                        "x": 400,
+                        "y": 200
+                    },
+                    "inputSockets": [
+                        {
+                            "guid": "12345678-1234-1234-1234-123456789011",
+                            "name": "A",
+                            "type": "Boolean"
+                        },
+                        {
+                            "guid": "12345678-1234-1234-1234-123456789012",
+                            "name": "B",
+                            "type": "Boolean"
+                        }
+                    ],
+                    "outputSockets": [
+                        {
+                            "guid": "12345678-1234-1234-1234-123456789013",
+                            "name": "Output",
+                            "type": "Boolean"
+                        }
+                    ]
+                },
+                {
+                    "guid": "12345678-1234-1234-1234-123456789020",
+                    "name": "Nor",
+                    "type": "NorNode",
+                    "position": {
+                        "x": 250,
+                        "y": 350
+                    },
+                    "inputSockets": [
+                        {
+                            "guid": "12345678-1234-1234-1234-123456789021",
+                            "name": "A",
+                            "type": "Boolean"
+                        },
+                        {
+                            "guid": "12345678-1234-1234-1234-123456789022",
+                            "name": "B",
+                            "type": "Boolean"
+                        }
+                    ],
+                    "outputSockets": [
+                        {
+                            "guid": "12345678-1234-1234-1234-123456789023",
+                            "name": "Output",
+                            "type": "Boolean"
+                        }
+                    ]
+                },
+                {
+                    "guid": "12345678-1234-1234-1234-123456789030",
+                    "name": "Xor",
+                    "type": "XorNode",
+                    "position": {
+                        "x": 100,
+                        "y": 350
+                    },
+                    "inputSockets": [
+                        {
+                            "guid": "12345678-1234-1234-1234-123456789031",
+                            "name": "A",
+                            "type": "Boolean"
+                        },
+                        {
+                            "guid": "12345678-1234-1234-1234-123456789032",
+                            "name": "B",
+                            "type": "Boolean"
+                        }
+                    ],
+                    "outputSockets": [
+                        {
+                            "guid": "12345678-1234-1234-1234-123456789033",
+                            "name": "Output",
+                            "type": "Boolean"
+                        }
+                    ]
+                }
+            ],
+            "connections": [
+                {
+                    "output": "12345678-1234-1234-1234-123456789003",
+                    "input": "12345678-1234-1234-1234-123456789011"
+                },
+                {
+                    "output": "12345678-1234-1234-1234-123456789023",
+                    "input": "12345678-1234-1234-1234-123456789012"
+                },
+                {
+                    "output": "12345678-1234-1234-1234-123456789033",
+                    "input": "12345678-1234-1234-1234-123456789021"
+                }
+            ]
+        }
+    ]
 }

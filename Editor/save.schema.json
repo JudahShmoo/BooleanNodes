@@ -16,15 +16,22 @@
 						"items": {
 							"type": "object",
 							"properties": {
-								"guid": {
-									"type": "string",
-									"format": "uuid"
-								},
+								"guid": { "$ref": "#/$defs/guid"},
 								"name": { "type": "string" },
+								"type": { "type": "string" },
+								"position": {
+									"type": "object",
+									"properties": {
+										"x": { "type": "number" },
+										"y": { "type": "number" }
+									},
+									"required": [ "x", "y" ],
+									"additionalProperties": false
+								},
 								"outputSockets": { "$ref": "#/$defs/socketArray" },
 								"inputSockets": { "$ref": "#/$defs/socketArray" }
 							},
-							"required": [ "guid", "name", "outputSockets", "inputSockets" ],
+							"required": [ "guid", "name", "type", "position" ],
 							"additionalProperties": false
 						}
 					},
@@ -33,14 +40,8 @@
 						"items": {
 							"type": "object",
 							"properties": {
-								"input": {
-									"type": "string",
-									"format": "uuid"
-								},
-								"output": {
-									"type": "string",
-									"format": "uuid"
-								}
+								"input": { "$ref": "#/$defs/guid"},
+								"output": { "$ref": "#/$defs/guid"}
 							},
 							"required": [ "input", "output" ],
 							"additionalProperties": false
@@ -56,15 +57,17 @@
 	"required": [ "graphs", "projectName" ],
 
 	"$defs": {
+		"guid": {
+			"type": "string",
+			"format": "uuid",
+			"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+		},
 		"socketArray": {
 			"type": "array",
 			"items": {
 				"type": "object",
 				"properties": {
-					"guid": {
-						"type": "string",
-						"format": "uuid"
-					},
+					"guid": { "$ref": "#/$defs/guid"},
 					"name": { "type": "string" },
 					"type": { "type": "string" }
 				},

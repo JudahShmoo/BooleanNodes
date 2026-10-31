@@ -1,3 +1,86 @@
+# ./Editor/DataClasses/Position.cs
+
+```csharp
+﻿namespace Editor.DataClasses;
+public struct Position(float x, float y)
+{
+	public float X { get; set; } = x;
+	public float Y { get; set; } = y;
+
+	public static Position operator +(Position a, Position b) => new(a.X + b.X, a.Y + b.Y);
+	public static Position operator -(Position a, Position b) => new(a.X - b.X, a.Y - b.Y);
+	public static Position operator *(Position a, float scalar) => new(a.X * scalar, a.Y * scalar);
+	public static Position operator /(Position a, float scalar) => new(a.X / scalar, a.Y / scalar);
+	public static Position operator *(float scalar, Position a) => a * scalar;
+	public static Position operator /(float scalar, Position a) => new(scalar / a.X, scalar / a.Y);
+	public static bool operator ==(Position a, Position b) => a.X == b.X && a.Y == b.Y;
+	public static bool operator !=(Position a, Position b) => !(a == b);
+
+	public readonly override bool Equals(object? obj) => obj is Position position && this == position;
+	public readonly override int GetHashCode() => HashCode.Combine(X, Y);
+
+	public static Position Zero => new(0, 0);
+	public static Position One => new(1, 1);
+}
+```
+
+# ./Editor/Editor.csproj
+
+```csharp
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
+    <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="save.schema.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="save.schema.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.13" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.13" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Nodes\Nodes.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
+  </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties testsave_1json__JsonSchema="..\..\..\c#\BooleanNodes\Editor\save.schema.json" /></VisualStudio></ProjectExtensions>
+
+</Project>
+
+```
+
+# ./Editor/Program.cs
+
+```csharp
+using Editor;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+
+var builder = WebAssemblyHostBuilder.CreateDefault(args);
+builder.RootComponents.Add<App>("#app");
+builder.RootComponents.Add<HeadOutlet>("head::after");
+
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+
+await builder.Build().RunAsync();
+
+```
+
 # ./NodeTester/NodeTester.csproj
 
 ```csharp
@@ -22,9 +105,50 @@
 
 ```csharp
 ﻿using Nodes;
+using Nodes.BasicNodes;
 
 NodeGraph graph = new();
 
+AndNode and1 = new();
+AndNode and2 = new();
+NorNode nor = new();
+XorNode xor = new();
+
+graph.AddNode(and1);
+graph.AddNode(and2);
+graph.AddNode(nor);
+graph.AddNode(xor);
+
+graph.Connect(and1.Output, and2.A);
+graph.Connect(nor.Output, and2.B);
+graph.Connect(xor.Output, nor.A);
+
+void LogValues()
+{
+	Console.WriteLine($"And1 - A: {and1.A.Value}, B: {and1.B.Value}, Output: {and1.Output.Value}");
+	Console.WriteLine($"And2 - A: {and2.A.Value}, B: {and2.B.Value}, Output: {and2.Output.Value}");
+	Console.WriteLine($"Nor - A: {nor.A.Value}, B: {nor.B.Value}, Output: {nor.Output.Value}");
+	Console.WriteLine($"Xor - A: {xor.A.Value}, B: {xor.B.Value}, Output: {xor.Output.Value}");
+	Console.WriteLine("--------------------------------------------------");
+}
+
+LogValues();
+and1.A.DefaultValue = true;
+LogValues();
+and1.B.DefaultValue = true;
+LogValues();
+and2.A.DefaultValue = true;
+LogValues();
+and2.B.DefaultValue = true;
+LogValues();
+nor.A.DefaultValue = true;
+LogValues();
+nor.B.DefaultValue = true;
+LogValues();
+xor.A.DefaultValue = true;
+LogValues();
+xor.B.DefaultValue = true;
+LogValues();
 ```
 
 # ./Nodes/BasicNodes/AndNode.cs
@@ -45,6 +169,60 @@ public class AndNode : Node
 }
 ```
 
+# ./Nodes/BasicNodes/NorNode.cs
+
+```csharp
+﻿namespace Nodes.BasicNodes;
+public class NorNode : Node
+{
+	public NorNode() : base("Nor")
+	{
+		A = AddInput("A", false);
+		B = AddInput("B", false);
+		Output = AddOutput("Output", () => !(A.Value || B.Value));
+	}
+	public InputSocket<bool> A { get; }
+	public InputSocket<bool> B { get; }
+	public OutputSocket<bool> Output { get; }
+}
+```
+
+# ./Nodes/BasicNodes/OrNode.cs
+
+```csharp
+﻿namespace Nodes.BasicNodes;
+public class OrNode : Node
+{
+	public OrNode() : base("Or")
+	{
+		A = AddInput("A", false);
+		B = AddInput("B", false);
+		Output = AddOutput("Output", () => A.Value || B.Value);
+	}
+	public InputSocket<bool> A { get; }
+	public InputSocket<bool> B { get; }
+	public OutputSocket<bool> Output { get; }
+}
+```
+
+# ./Nodes/BasicNodes/XorNode.cs
+
+```csharp
+﻿namespace Nodes.BasicNodes;
+public class XorNode : Node
+{
+	public XorNode() : base("Xor")
+	{
+		A = AddInput("A", false);
+		B = AddInput("B", false);
+		Output = AddOutput("Output", () => A.Value ^ B.Value);
+	}
+	public InputSocket<bool> A { get; }
+	public InputSocket<bool> B { get; }
+	public OutputSocket<bool> Output { get; }
+}
+```
+
 # ./Nodes/Connection.cs
 
 ```csharp
@@ -54,26 +232,24 @@ public interface IConnection
 {
 	IOutputSocket Output { get; }
 	IInputSocket Input { get; }
+	void NotifyConnection();
+	void NotifyDisconnection();
 }
-public class Connection<T> : IConnection
+public class Connection<T>(OutputSocket<T> output, InputSocket<T> input) : IConnection
 {
-	public OutputSocket<T> Output { get; }
-	public InputSocket<T> Input { get; }
+	public OutputSocket<T> Output { get; } = output;
+	public InputSocket<T> Input { get; } = input;
 	IOutputSocket IConnection.Output => Output;
 	IInputSocket IConnection.Input => Input;
-
-	public Connection(OutputSocket<T> output, InputSocket<T> input)
+	public void NotifyConnection()
 	{
-		Output = output;
-		Input = input;
 		Output.NotifyConnection();
 		Input.NotifyConnection();
 	}
-
-	~Connection()
+	public void NotifyDisconnection()
 	{
-		Output.NotifyConnection();
-		Input.NotifyConnection();
+		Output.NotifyDisconnection();
+		Input.NotifyDisconnection();
 	}
 }
 ```
@@ -86,10 +262,13 @@ public class Connection<T> : IConnection
 public interface IInputSocket : ISocket { }
 public class InputSocket<T> : Socket<T>, IInputSocket
 {
+	private void InvokeValueChanged() => ValueChanged?.Invoke();
 	public InputSocket(Node owner, string name) : base(owner, name)
 	{
-		OnConnection += () => ValueChanged?.Invoke();
-		OnDisconnection += () => ValueChanged?.Invoke();
+		OnConnection += InvokeValueChanged;
+		OnConnection += () => Connection!.Output.ValueChanged += InvokeValueChanged;
+		OnDisconnection += InvokeValueChanged;
+		OnDisconnection += () => Connection!.Output.ValueChanged -= InvokeValueChanged;
 	}
 	public required T DefaultValue { 
 		get; 
@@ -164,7 +343,8 @@ public class NodeGraph
 	{
 		node.Graph = null;
 		nodes.Remove(node);
-		connections.RemoveAll(c => c.Input.Owner == node || c.Output.Owner == node);
+		foreach (IConnection connection in connections.Where(c => c.Input.Owner == node || c.Output.Owner == node))
+			Disconnect(connection);
 	}
 
 	public Connection<T> Connect<T>(OutputSocket<T> output, InputSocket<T> input)
@@ -173,15 +353,17 @@ public class NodeGraph
 		Connection<T> connection = new(output, input);
 		connections.Add(connection);
 		OnConnection?.Invoke(connection);
+		connection.NotifyConnection();
 		return connection;
 	}
 	public void Disconnect(IConnection connection)
 	{
 		connections.Remove(connection);
+		connection.NotifyDisconnection();
 		OnDisconnection?.Invoke(connection);
 	}
 	public IConnection? GetConnection(ISocket socket) => connections.FirstOrDefault(c => c.Input == socket || c.Output == socket);
-	public Connection<T>? GetConnection<T>(Socket<T> socket) => GetConnection(socket);
+	public Connection<T>? GetConnection<T>(Socket<T> socket) => connections.Cast<Connection<T>>().FirstOrDefault(c => c.Input == socket || c.Output == socket);
 	public IEnumerable<IConnection> GetConnections(IOutputSocket output) => connections.Where(c => c.Output == output);
 }
 ```
@@ -211,6 +393,7 @@ public class OutputSocket<T> : Socket<T>, IOutputSocket
 {
 	public OutputSocket(Node owner, string name, Func<T> computeValue) : base(owner, name)
 	{
+		value = computeValue();
 		Owner.OnInputChanged += () =>
 		{
 			T newValue = computeValue();
@@ -221,7 +404,7 @@ public class OutputSocket<T> : Socket<T>, IOutputSocket
 			}
 		};
 	}
-	private T value = default!;
+	private T value;
 	public override T Value => value;
 
 	public override event Action? ValueChanged;
@@ -241,6 +424,7 @@ public interface ISocket
 	event Action? ValueChanged;
 	NodeGraph? Graph { get; }
 	IConnection? Connection => Graph?.GetConnection(this);
+	Type GetType();
 }
 public abstract class Socket<T>(Node owner, string name) : ISocket
 {
@@ -255,6 +439,7 @@ public abstract class Socket<T>(Node owner, string name) : ISocket
 	public event Action? OnDisconnection;
 	internal void NotifyConnection() => OnConnection?.Invoke();
 	internal void NotifyDisconnection() => OnDisconnection?.Invoke();
+	Type ISocket.GetType() => typeof(T);
 }
 ```
 

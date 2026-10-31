@@ -1,0 +1,76 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"title": "Boolean Node Save File",
+	"description": "A json save file containing multiple node graphs",
+
+	"type": "object",
+	"properties": {
+		"graphs": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"name": { "type": "string" },
+					"nodes": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"properties": {
+								"guid": {
+									"type": "string",
+									"format": "uuid"
+								},
+								"name": { "type": "string" },
+								"outputSockets": { "$ref": "#/$defs/socketArray" },
+								"inputSockets": { "$ref": "#/$defs/socketArray" }
+							},
+							"required": [ "guid", "name", "outputSockets", "inputSockets" ],
+							"additionalProperties": false
+						}
+					},
+					"connections": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"properties": {
+								"input": {
+									"type": "string",
+									"format": "uuid"
+								},
+								"output": {
+									"type": "string",
+									"format": "uuid"
+								}
+							},
+							"required": [ "input", "output" ],
+							"additionalProperties": false
+						}
+					}
+				},
+				"required": [ "name", "nodes", "connections" ],
+				"additionalProperties": false
+			}
+		},
+		"projectName": { "type": "string" }
+	},
+	"required": [ "graphs", "projectName" ],
+
+	"$defs": {
+		"socketArray": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"guid": {
+						"type": "string",
+						"format": "uuid"
+					},
+					"name": { "type": "string" },
+					"type": { "type": "string" }
+				},
+				"required": [ "guid", "name", "type" ],
+				"additionalProperties": false
+			}
+		}
+	}
+}

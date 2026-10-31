@@ -1,0 +1,10 @@
+﻿.socket {
+	--socket-size: 5px;
+	width: calc(100% + var(--socket-size));
+	text-decoration: none;
+
+	svs {
+		width: var(--socket-size);
+		height: var(--socket-size);
+	}
+}

@@ -8,6 +8,7 @@ public interface ISocket
 	event Action? ValueChanged;
 	NodeGraph? Graph { get; }
 	IConnection? Connection => Graph?.GetConnection(this);
+	Type GetType();
 }
 public abstract class Socket<T>(Node owner, string name) : ISocket
 {
@@ -22,4 +23,5 @@ public abstract class Socket<T>(Node owner, string name) : ISocket
 	public event Action? OnDisconnection;
 	internal void NotifyConnection() => OnConnection?.Invoke();
 	internal void NotifyDisconnection() => OnDisconnection?.Invoke();
+	Type ISocket.GetType() => typeof(T);
 }

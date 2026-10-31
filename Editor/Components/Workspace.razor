@@ -1,0 +1,18 @@
+﻿<div class="node-canvas">
+    <svg class="connections">
+        @foreach (IConnection connection in NodeGraph.Connections)
+        {
+            <ConnectionView StartPos="new(0, 0)" EndPos="new(0, 0)"/>
+        }
+    </svg>
+
+    @foreach (Node node in NodeGraph.Nodes)
+    {
+        <NodeView Node="@node" />
+    }
+</div>
+
+
+@code {
+    [Parameter, EditorRequired] public NodeGraph NodeGraph { get; set; } = new();
+}

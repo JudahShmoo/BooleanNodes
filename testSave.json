@@ -1,0 +1,11 @@
+{
+	"$schema": "./Editor/save.schema.json",
+	"projectName": "Test Project",
+	"graphs": [
+		{
+			"name": "Test Graph",
+			"nodes": [],
+			"connections": []
+		}
+	]
+}

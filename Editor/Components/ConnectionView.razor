@@ -1,0 +1,10 @@
+﻿<path d="M @StartPos.X @StartPos.Y C @ControlPoint1.X @ControlPoint1.Y @ControlPoint2.X @ControlPoint2.Y @EndPos.X @EndPos.Y"/>
+
+@code {
+	[Parameter, EditorRequired] public Position StartPos { get; set; } = default!;
+	[Parameter, EditorRequired] public Position EndPos { get; set; } = default!;
+
+	private float ControlPointOffset => MathF.Abs(StartPos.X - EndPos.X) * 0.5f;
+	private Position ControlPoint1 => new Position(StartPos.X + ControlPointOffset, StartPos.Y);
+	private Position ControlPoint2 => new Position(EndPos.X - ControlPointOffset, EndPos.Y);
+}

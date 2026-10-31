@@ -1,0 +1,9 @@
+﻿<li class="socket">
+	<span>@Input.Name</span>
+	<svg><circle cx="5" cy="5" r="3" /></svg>
+</li>
+
+
+@code {
+	[Parameter, EditorRequired] public IInputSocket Input { get; set; } = default!;
+}

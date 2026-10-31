@@ -1,0 +1,17 @@
+﻿<div>
+	<h1>@Node.Name</h1>
+	<ul>
+		@foreach (IOutputSocket output in Node.Outputs)
+		{
+			<OutputView Output="@output" />
+		}
+		@foreach (IInputSocket input in Node.Inputs)
+		{
+			<InputView Input="@input" />
+		}
+	</ul>
+</div>
+
+@code {
+	[Parameter, EditorRequired] public Node Node { get; set; } = default!;
+}
